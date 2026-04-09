@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>BADINAN FILM PRO</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary: #00f2ff; --bg: #030508; --card-bg: #0a0f14;
@@ -13,40 +14,52 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', 'Arial', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); color: #fff; overflow-x: hidden; }
 
-        /* --- Security Wall --- */
-        #auth-wall { position: fixed; inset: 0; z-index: 9999; background: #000; display: flex; align-items: center; justify-content: center; padding: 30px; }
-        .lock-box { width: 100%; max-width: 350px; text-align: center; background: rgba(255,255,255,0.03); padding: 40px; border-radius: 40px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(20px); }
-        input { width: 100%; padding: 18px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.5); color: #fff; margin-bottom: 20px; text-align: center; font-size: 18px; outline: none; }
-        .go-btn { width: 100%; padding: 18px; border-radius: 20px; border: none; background: var(--primary); color: #000; font-weight: 900; cursor: pointer; text-transform: uppercase; }
+        /* --- Security Wall (Login Screen) --- */
+        #auth-wall { position: fixed; inset: 0; z-index: 9999; background: var(--bg); display: flex; align-items: center; justify-content: center; padding: 30px; }
+        .lock-box { width: 100%; max-width: 350px; text-align: center; background: rgba(255,255,255,0.03); padding: 40px 30px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(20px); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        
+        .login-subtitle { color: var(--text-gray); font-size: 14px; margin-bottom: 30px; margin-top: 5px; font-weight: 300; }
+        
+        /* Social Login Buttons */
+        .auth-btn { 
+            display: flex; align-items: center; justify-content: center; gap: 12px; 
+            width: 100%; padding: 16px; border-radius: 18px; border: none; 
+            font-size: 15px; font-weight: 600; cursor: pointer; margin-bottom: 15px; 
+            transition: all 0.3s ease; position: relative; overflow: hidden;
+        }
+        .auth-btn:active { transform: scale(0.96); }
+        
+        .btn-google { background: #ffffff; color: #1f1f1f; }
+        .btn-google i { color: #EA4335; font-size: 18px; }
+        
+        .btn-apple { background: #000000; color: #ffffff; border: 1px solid rgba(255,255,255,0.15); }
+        .btn-apple i { font-size: 20px; }
+        
+        .loading-spinner { display: none; width: 20px; height: 20px; border: 3px solid rgba(0,0,0,0.1); border-top: 3px solid currentColor; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         /* --- Header --- */
         #app { display: none; }
         header { padding: 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); position: sticky; top: 0; background: var(--bg); z-index: 100; }
         .logo { font-weight: 900; font-size: 22px; color: #fff; text-transform: uppercase; }
         .logo span { color: var(--primary); }
+        
+        .user-profile-btn { background: rgba(255,255,255,0.1); width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; }
 
         .section-header { padding: 20px 25px 10px; font-size: 16px; font-weight: 600; color: var(--primary); text-align: right; }
 
         /* --- Movie Grid for Mobile --- */
-        #main-container { 
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 15px; 
-            padding: 10px 20px 30px; 
-        }
+        #main-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 10px 20px 30px; }
         
         /* --- Card Design --- */
         .card { width: 100%; cursor: pointer; transition: transform 0.3s; }
         .card:active { transform: scale(0.95); }
         .card-img-box { width: 100%; height: 230px; border-radius: 15px; overflow: hidden; position: relative; border: 1px solid rgba(255,255,255,0.1); }
         .card-img-box img { width: 100%; height: 100%; object-fit: cover; }
-        
         .card-title { font-size: 13px; font-weight: 700; margin-top: 10px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        
         .meta-bar { display: flex; justify-content: center; gap: 5px; margin-top: 5px; font-size: 9px; color: var(--text-gray); }
         .meta-bar span { background: rgba(255,255,255,0.05); padding: 2px 6px; border-radius: 4px; }
         .rating-box { color: var(--gold); font-weight: bold; }
-        
         .translator-tag { font-size: 10px; color: var(--primary); text-align: center; margin-top: 4px; opacity: 0.8; font-weight: 600; }
 
         /* --- Episode Modal --- */
@@ -56,16 +69,7 @@
         .modal-title { font-size: 18px; font-weight: 800; flex: 1; text-align: center; }
 
         .episodes-container { padding: 15px; }
-        .ep-row { 
-            background: #0f1217; 
-            margin-bottom: 10px; 
-            border-radius: 12px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            padding: 18px 20px; 
-            border: 1px solid rgba(255,255,255,0.05);
-        }
+        .ep-row { background: #0f1217; margin-bottom: 10px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border: 1px solid rgba(255,255,255,0.05); }
         .ep-row:active { background: #1a1f26; }
         .ep-row span { font-size: 14px; font-weight: 600; color: #eee; }
         .play-icon { color: var(--primary); font-size: 14px; }
@@ -80,14 +84,27 @@
     <div id="auth-wall">
         <div class="lock-box">
             <h1 class="logo">BADINAN<span>FILM</span></h1>
-            <p style="color: #666; font-size: 12px; margin-bottom: 20px;">سیستەمێ پاراستنێ</p>
-            <input type="password" id="passInput" placeholder="دەربازببۆ">
-            <button class="go-btn" onclick="startApp()">Unlock</button>
+            <p class="login-subtitle">بۆ دیتنا فیلمان پێشتر چوونەژوورێ بکە</p>
+            
+            <button class="auth-btn btn-google" id="googleBtn" onclick="simulateLogin('google')">
+                <i class="fa-brands fa-google" id="googleIcon"></i>
+                <div class="loading-spinner" id="googleLoader"></div>
+                <span id="googleText">ب ڕێکا Google</span>
+            </button>
+
+            <button class="auth-btn btn-apple" id="appleBtn" onclick="simulateLogin('apple')">
+                <i class="fa-brands fa-apple" id="appleIcon"></i>
+                <div class="loading-spinner" id="appleLoader" style="border-top-color: #fff; border-color: rgba(255,255,255,0.2);"></div>
+                <span id="appleText">ب ڕێکا Apple ID</span>
+            </button>
         </div>
     </div>
 
     <div id="app">
-        <header><div class="logo">BADINAN<span>FILM</span></div></header>
+        <header>
+            <div class="logo">BADINAN<span>FILM</span></div>
+            <div class="user-profile-btn"><i class="fa-solid fa-user"></i></div>
+        </header>
         <div class="section-header">هەمی فیلم و زنجیرە</div>
         <div id="main-container"></div>
     </div>
@@ -107,20 +124,7 @@
 
     <script>
         const movieDB = [
-            { 
-                title: "ONE High School", genre: "Drama", year: "2025", duration: "6H:15M", rating: "7.7", translator: "یوسف شیروان / ئافا سابیر",
-                img: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiS9_OsuhB2RRka8WKoinOZRTzC_5iukCUxjghyQBTCtj_YAMJ7fRU4hO9Wl3lVQb9i-Kxjoq4v0ach8TInLWrP7aj3KQYqxxdhLEOW0SJKd-GtAuF8zH3vtRz-_MlOK-1kZkogsQP25cU5xhphOxTg7ICgx0fKg7tEOnhuLM-onfgqoqwT7geCCnIyYq4/s320/78DE1FFD-9D0B-4C6D-8ECE-9068F8F4BC0D.jpeg", 
-                episodes: [
-                       { name: "خەلەکا 1", link: "https://vidmoly.net/embed-salj378j53kx.html" },
-                    { name: "خەلەکا 2", link: "https://vidmoly.net/embed-vd5wqv4qngjm.html" },
-                    { name: "خەلەکا 3", link: "https://vidmoly.net/embed-t2zs4bonexwz.html" },
-                    { name: "خەلەکا 4", link: "https://vidmoly.net/embed-e1knqybm0k41.html" },
-                    { name: "خەلەکا 5", link: "https://vidmoly.net/embed-40ajozrwm7lk.html" },
-                    { name: "خەلەکا 6", link: "https://vidmoly.net/embed-96vwx63ziwvh.html" },
-                    { name: "خەلەکا 7", link: "https://vidmoly.net/embed-gu24flhv4ept.html" },
-                    { name: "خەلەکا 8 (دوماهیک)", link: "https://vidmoly.net/embed-i99816w0f36h.html" }
-                ]
-            },
+            { title: "ONE High School", genre: "Drama", year: "2025", duration: "6H:15M", rating: "7.7", translator: "یوسف شیروان / ئافا سابیر", img: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiS9_OsuhB2RRka8WKoinOZRTzC_5iukCUxjghyQBTCtj_YAMJ7fRU4hO9Wl3lVQb9i-Kxjoq4v0ach8TInLWrP7aj3KQYqxxdhLEOW0SJKd-GtAuF8zH3vtRz-_MlOK-1kZkogsQP25cU5xhphOxTg7ICgx0fKg7tEOnhuLM-onfgqoqwT7geCCnIyYq4/s320/78DE1FFD-9D0B-4C6D-8ECE-9068F8F4BC0D.jpeg", episodes: [ { name: "خەلەکا 1", link: "https://vidmoly.net/embed-salj378j53kx.html" }, { name: "خەلەکا 2", link: "https://vidmoly.net/embed-vd5wqv4qngjm.html" }, { name: "خەلەکا 3", link: "https://vidmoly.net/embed-t2zs4bonexwz.html" }, { name: "خەلەکا 4", link: "https://vidmoly.net/embed-e1knqybm0k41.html" }, { name: "خەلەکا 5", link: "https://vidmoly.net/embed-40ajozrwm7lk.html" }, { name: "خەلەکا 6", link: "https://vidmoly.net/embed-96vwx63ziwvh.html" }, { name: "خەلەکا 7", link: "https://vidmoly.net/embed-gu24flhv4ept.html" }, { name: "خەلەکا 8 (دوماهیک)", link: "https://vidmoly.net/embed-i99816w0f36h.html" } ] },
             { title: "Ne Zha I", genre: "Anymayshn", year: "2019", duration: "1H:50M", rating: "7.5", translator: "یوسف شیروان", img: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiA-dLq1CtBmRg-PrZk1UMVA2EiDPxnaeQ3lZ42PQzS-dvZaLkqNLJF9NJ7DVsE3LcvcN-m3MmPyd1x-oN5JK_Ap4JZNT48qx4Ys8CGSrYjqh1uKxA47W389qXMLom97g-Vc-ShxEuXdUlhWrxzGP5woHBZ2Q9-CqiVO59miDO-S-hAwtyPn5NJoVeJsnw/s320/ne%20zha%20badinan.png", link: "https://vidmoly.net/embed-b0rn9jh3himw.html" },
             { title: "Ne Zha II", genre: "Anymayshn", year: "2025", duration: "2H:24M", rating: "8.0", translator: "یوسف شیروان", img: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhLmzdgQYR_drNBqlCOCDz3C2A0roUagCNIQr0BBLvlza58MChJVd20blBSSH0nj6E4B3LvyCgupGfu_59aCFwo6ANaTR7Gtl0mDp5tPhyphenhyphenbANc31cG3uuqtIjFEb2yX2r05fiDiV1QgH0xGA1EkUgvI0NxUxL0vSyLEJF7N4V4doXaVRr1PvqW8AgFdo0k/s320/ne%20zha%20II.png", link: "https://vidmoly.net/embed-y9u8vqj5wco0.html" },
             { title: "Bullet Train", genre: "Akshn", year: "2025", duration: "2H:14M", rating: "6.2", translator: "یوسف شیروان", img: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgOAuhGJ-_lYLtVNjsay8Po-FABc4MLM0SZiSCpJeRn64bUfGrZ8_zPg7oWuFsl2LDyJZ9yDGSrCeu8l8yC45WHwy5ANmW1LtLkoLkLY4C3w1SgSwyqW3CkhkP0xcJFPNexgLeLYhNeUN-WlDXfaxMWqe8fVkZ5kAsPq-FMtpnd7a3K-nRR5561jVBGE1w/s320/AE91AB3F-1564-40EF-8CE1-2D979A411F67.jpeg", link: "https://vidmoly.net/embed-988vfml5ctlu.html" },
@@ -132,7 +136,20 @@
             { title: "In Time", genre: "Akshn", year: "2011", duration: "1H:49M", rating: "6.7", translator: "یوسف شیروان", img: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiFqpJrvxrt1lKUshSb9SgZxgXqYijjlLRIflQ92t0Qtehv0BDQU4itnTYJ9PoZirBQNST-iYGPMIJ3PHPPRmhyZJ9z2iEASiDKEcF4xnviPVNC1cXZU52nBZExWbdW6q3c18h5bakSYaAb-BCNOxDtwHh7AmSbCc9cosWLSX9hM7SODGn6uyjrVpU5Tng/s320/1_1_2026%202_47_43%20PM.png", link: "https://vidmoly.net/embed-kru1g80vmi5z.html" }
         ];
 
-        function startApp() { if(document.getElementById('passInput').value.length >= 8) { document.getElementById('auth-wall').style.display = 'none'; document.getElementById('app').style.display = 'block'; render(); } }
+        // Simulate a real login delay
+        function simulateLogin(provider) {
+            // UI Loading state
+            document.getElementById(provider + 'Icon').style.display = 'none';
+            document.getElementById(provider + 'Loader').style.display = 'block';
+            document.getElementById(provider + 'Text').innerText = 'چاوەڕێ بە...';
+            
+            // Wait 1.5 seconds to feel like a real login, then open app
+            setTimeout(() => {
+                document.getElementById('auth-wall').style.display = 'none';
+                document.getElementById('app').style.display = 'block';
+                render();
+            }, 1500);
+        }
         
         function render() {
             const container = document.getElementById('main-container');
